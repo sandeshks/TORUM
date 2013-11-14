@@ -6,7 +6,7 @@ using namespace std;
 
 
 //Msg type=100
-Controller::Controller(void):QuorumTable{{0,1},{0,2},{1,2}/*{0, 1, 2, 3, 4, 8, 12},
+Controller::Controller(void):QuorumTable{{0,1},{1,2},{0,2}/*{0, 1, 2, 3, 4, 8, 12},
 		{0, 1, 2, 3, 5, 9, 13},
 		{0, 1, 2, 3, 6, 10, 14},
 		{0, 1, 2, 3, 7, 11, 15},
@@ -174,15 +174,6 @@ void Controller::sendTokenToNode()
 
 	com.sendMessage(pack,desIP,LISTEN_PORT3);
 
-	Packet pack1;
-		pack1.TYPE = MAKE_REQUEST;
-		pack1.ORIGIN = CONTROLLER_ID;
-		pack1.SEQ =1;
-		pack1.sender = CONTROLLER_ID;
-		char desIP2[16];
-			strncpy(desIP2,mapIPtoID[1],16);
-			printf("sending MAKE_REQUEST to Node 1 at IP %s\n",desIP2);
-
 }
 
 void Controller::decideAlgorithm(){
@@ -228,7 +219,8 @@ void Controller::Algorithm1(){
 void Controller::Algorithm2(){
 	printf("\nYou have chosen Token and Quorum Based Mutual Exclusion Algorithm: Torum\n");
 	sendTokenToNode();
-
+	UserInput();
+/*
 	Packet pack1;
 	pack1.TYPE = MAKE_REQUEST;
 	pack1.ORIGIN = CONTROLLER_ID;
@@ -239,14 +231,40 @@ void Controller::Algorithm2(){
 	strncpy(desIP,mapIPtoID[1],16);
 	printf("sending MAKE_REQUEST to Node 1 at IP %s\n",desIP);
 
+
 	com.sendMessage(pack1,desIP,LISTEN_PORT3);
 	pack1.SEQ =2;
 	com.sendMessage(pack1,desIP,LISTEN_PORT3);
 	pack1.SEQ =3;
 	//com.sendMessage(pack1,desIP,LISTEN_PORT3);
-	sleep(10);
+
+	 */
 }
 
+void Controller::UserInput(){
+	printf("Enter your requests for critical section here...\n");
+	printf("");
+	for(int i=0;i<10;i++){
+		int id=0;
+		printf("enter id to send request for CS\n");
+		cin>>id;
+		sendCSrequests(id);
+	}
+}
+
+void Controller::sendCSrequests(int node){
+	Packet pack1;
+	pack1.TYPE = MAKE_REQUEST;
+	pack1.ORIGIN = CONTROLLER_ID;
+	pack1.SEQ =1;
+	pack1.sender = CONTROLLER_ID;
+	communication com;
+	char desIP[16];
+	strncpy(desIP,mapIPtoID[node],16);
+	printf("sending MAKE_REQUEST to Node %d at IP %s\n",node,desIP);
+
+	com.sendMessage(pack1,desIP,LISTEN_PORT3);
+}
 void Controller::initiate(Controller *c){
 	pthread_t listen;
 	pthread_create(&listen, NULL,listener,(void*)c );

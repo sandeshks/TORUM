@@ -2,13 +2,18 @@
 
 Torum* Torum::instance = NULL;
 
+Torum::~Torum(){
+	pthread_mutex_destroy(&sharedQLock);
+}
 void Torum::init()
 {
 	sequenceNo = 0;
 	HOLDER = -1;
 	inCS = false;
 	queue = new LexiQueue();
-	pthread_mutex_init(&sharedQLock,NULL);
+	if(pthread_mutex_init(&sharedQLock,NULL)!=0){
+		printf("\n mutex lock init failed\n");
+	}
 }
 
 Torum* Torum::getInstance()
@@ -49,20 +54,22 @@ bool Torum::requestCS(){
 			com.sendMessageToID(request,quorum[ID][i]);
 		}
 	}else{
+		queue->add(request);
 		com.sendMessageToID(request,HOLDER);
 	}
 	return true;
 }
 
 bool Torum::receiveRequest(Packet request){
+printf("in receive Request, request from %d\n",request.ORIGIN);
 	if(sequenceNo<request.SEQ) sequenceNo = request.SEQ;
 	//check if the token is with this node
 	// token is not with this node
 		//request from its master(within quorum request)
 		if(request.ORIGIN == request.sender){
-			pthread_mutex_lock(&sharedQLock);
+			//pthread_mutex_lock(&sharedQLock);
 			queue->add(request);
-			pthread_mutex_unlock(&sharedQLock);
+			//pthread_mutex_unlock(&sharedQLock);
 			if(HOLDER == ID){
 				if(!inCS){// Node is idle after completing CS.
 					Packet top = queue->top();
@@ -76,9 +83,9 @@ bool Torum::receiveRequest(Packet request){
 			}
 		}else{// request originated from out of this quorum
 			if(HOLDER==ID){
-					pthread_mutex_lock(&sharedQLock);
+					//pthread_mutex_lock(&sharedQLock);
 					queue->add(request);
-					pthread_mutex_unlock(&sharedQLock);
+					//pthread_mutex_unlock(&sharedQLock);
 
 				}
 			//else drop the request
@@ -90,12 +97,12 @@ bool Torum::receiveRequest(Packet request){
 
 bool Torum::receiveToken(Packet token){
 	if(sequenceNo<token.SEQ) sequenceNo = token.SEQ;
-	pthread_mutex_lock(&sharedQLock);
+	//pthread_mutex_lock(&sharedQLock);
 	Packet top = queue->top();
 	if(top.TYPE == -1){
 		printf("receiveToken: queue top returned empty\n");
 	}
-	pthread_mutex_unlock(&sharedQLock);
+	//pthread_mutex_unlock(&sharedQLock);
 
 	if(ID == top.ORIGIN || top.ORIGIN == CONTROLLER_ID){// if current node is top of the queue
 		HOLDER = ID;
@@ -107,8 +114,9 @@ bool Torum::receiveToken(Packet token){
 		for(int i=0;i<quorumsize;i++){
 			com.sendMessageToID(havetkn,quorum[ID][i]);
 		}
-		if(ID == top.ORIGIN)
+		if(ID == top.ORIGIN){
 			EnterTheCS();
+		}
 	}else{
 		// sends token to the request on top of the queue
 		//Note: we are not passing the same packet that we received
@@ -120,16 +128,16 @@ bool Torum::receiveToken(Packet token){
 bool Torum::receiveRelease(Packet release){
 	if(sequenceNo<release.SEQ) sequenceNo = release.SEQ;
 	HOLDER = -1;
-	pthread_mutex_lock(&sharedQLock);
+	//pthread_mutex_lock(&sharedQLock);
 	queue->update(quorum,quorumsize,ID);
-	pthread_mutex_unlock(&sharedQLock);
+	//pthread_mutex_unlock(&sharedQLock);
 	return true;
 }
 
 bool Torum::receiveHaveTkn(Packet havtkn){
 	if(sequenceNo<havtkn.SEQ) sequenceNo = havtkn.SEQ;
 	HOLDER = havtkn.ORIGIN;
-	pthread_mutex_lock(&sharedQLock);
+	//pthread_mutex_lock(&sharedQLock);
 	Packet ret = queue->remove(havtkn.ORIGIN);
 	if(ret.TYPE != -1){
 	Packet top = queue->top();
@@ -137,7 +145,7 @@ bool Torum::receiveHaveTkn(Packet havtkn){
 			printf("receiveToken: queue top returned empty\n");
 					return false;
 		}
-	pthread_mutex_unlock(&sharedQLock);
+	//pthread_mutex_unlock(&sharedQLock);
 	if(top.TYPE!=-1)
 		com.sendMessageToID(top,HOLDER);
 	return true;
@@ -166,9 +174,9 @@ bool Torum::sendToken(){
 	for(int i=0;i<quorumsize;i++){
 			com.sendMessageToID(release,quorum[ID][i]);
 		}
-	pthread_mutex_lock(&sharedQLock);
+	//pthread_mutex_lock(&sharedQLock);
 	queue->update(quorum,quorumsize,ID);
-	pthread_mutex_unlock(&sharedQLock);
+	//pthread_mutex_unlock(&sharedQLock);
 	
 	struct Packet token;
 		token.TYPE = SEND_TOKEN;
@@ -182,7 +190,7 @@ bool Torum::sendToken(){
 
 bool Torum::EnterTheCS(){
 	inCS = true;
-	printf("Node %d in Critical Section\n",ID);
+	printf("Node '%d' in CRITICAL SECTION\n",ID);
 	sleep(1);
 	inCS = false;
 }

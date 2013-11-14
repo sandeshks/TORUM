@@ -87,12 +87,7 @@ void Starter::registerAtController(char controllerIP[15],int port){
             Quorum[i][j] = 0;
         }
     }
-	/*for(int i=0;i<nsize;i++){
-		for(int j=0;j<qsize;j++){
-			printf("%d\t",Quorum[i][j]);
-		}
-		printf("\n");			
-	}*/
+
 	puts("Getting quorum table\n");
 	char recvdMsg[4096] = {'\0',};
 	com.readFromSocket(sockfd,recvdMsg,4095);

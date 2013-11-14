@@ -35,5 +35,7 @@ public:
 	void Algorithm1();
 	void Algorithm2();
 	void sendTokenToNode();
+	void UserInput();
+	void sendCSrequests(int node);
 };
 

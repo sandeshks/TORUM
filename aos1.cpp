@@ -19,6 +19,9 @@ int main() {
 	Starter s;
 	s.init();
 
+	//ifstream input("time.in", ios::in);
+
+
 	return 0;
 }
 /**/

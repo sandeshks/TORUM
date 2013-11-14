@@ -39,6 +39,7 @@ public:
 
 private:
 	Torum(){};
+	~Torum(void);
 	Torum(Torum const& copy){};
 	Torum& operator=(Torum const& copy){};
 	static Torum* instance;

@@ -93,7 +93,7 @@ int communication::sendMessage(struct Packet message, char dest_IP_Address[15],i
 }
 //000
 int communication::sendMessageToID(struct Packet message,int id){
-	printf("sending a message to %d , IP: %s\n",id,mapIDtoIP[id]);
+	printf("Sending a message to %d , IP: %s\n",id,mapIDtoIP[id]);
 	return sendMessage(message,mapIDtoIP[id],LISTEN_PORT3);
 }
 
@@ -107,7 +107,7 @@ void communication::DieWithError(string errorMessage)/* Error handling function 
 
 void communication::HandleTCPClient(int clntSocket, wqueue<Packet*>* m_queue)
 {
-	printf("Entered handling client");
+	//printf("Entered handling client");
 
     //char echoBuffer[RCVBUFSIZE] = {'\0'};        /* Buffer for echo string */
     int recvMsgSize;                    /* Size of received message */
@@ -132,31 +132,14 @@ void communication::HandleTCPClient(int clntSocket, wqueue<Packet*>* m_queue)
 	message1->ORIGIN=message.ORIGIN;
 	message1->SEQ=message.SEQ;
 	message1->sender=message.sender;
-	printf("adding to recv queue\n");
+	//printf("adding to recv queue\n");
 	m_queue->add(message1);
-	printf("queue size form listener:%d\n",m_queue->size());
+	//printf("queue size form listener:%d\n",m_queue->size());
 	}//is message a technical message
 	else if(message.TYPE >=100 && message.TYPE < 1000 ){
 
 	}
     /* Send received string and receive again until end of transmission */
-    
-  /*  while (recvMsgSize > 0)       zero indicates end of transmission 
-    {
-         Echo message back to client 
-        if (send(clntSocket, echoBuffer, recvMsgSize, 0) != recvMsgSize)
-            DieWithError("send() failed");
-
-         See if there is more data to receive 
-        if ((recvMsgSize = recv(clntSocket, echoBuffer, RCVBUFSIZE, 0)) < 0)
-            	DieWithError("recv() failed");
-
-             Terminate the string! 
-        	printf("%s\n", echoBuffer);
-
-
-    }*/
-
 
 }
 
@@ -201,8 +184,7 @@ int communication::serverListen(int portNum,wqueue<Packet*>* queue)
 
         /* clntSock is connected to a client! */
         char *client_ip = inet_ntoa(echoClntAddr.sin_addr);
-        printf("\nRequesting client socket %d, addlen : %d %s\n",clntSock,sizeof(client_ip),client_ip);
-        printf("Handling Node at %s\n", inet_ntoa(echoClntAddr.sin_addr));
+        //printf("\nA client requested to connect %d, %s\n",clntSock,client_ip);
         HandleTCPClient(clntSock,queue);
         //del++;
         close(clntSock);    /* Close client socket */
@@ -249,8 +231,7 @@ int communication::OpenListener(int& serSock, int portNum){
 
 	/* clntSock is connected to a client! */
 	char *client_ip = inet_ntoa(echoClntAddr.sin_addr);
-	printf("\nRequesting client socket %d, addlen : %d %s\n",clntSock,sizeof(client_ip),client_ip);
-	printf("Handling message from Node at %s\n", inet_ntoa(echoClntAddr.sin_addr));
+	//printf("\nRequesting client socket %d, addlen : %d %s\n",clntSock,sizeof(client_ip),client_ip);
 
 	serSock = servSock;
 	return clntSock;
