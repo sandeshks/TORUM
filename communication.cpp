@@ -43,13 +43,13 @@ int communication::connectToServer(char dest_IP_Address[15],int dest_port){
 			printf("\n Error in socket");
 			exit(0);
 		}
-	    printf("Socket created, ");
+	   // printf("Socket created, ");
 
 	    /* configuring server address structure */
 		bzero(&servaddr, sizeof(servaddr));
 		servaddr.sin_family = AF_INET;
 		servaddr.sin_port = htons(dest_port);
-		printf("Socket configured, ");
+		//printf("Socket configured, ");
 		if (inet_pton(AF_INET, dest_IP_Address, &servaddr.sin_addr) <= 0) {
 				printf("\n Error in inet_pton");
 				exit(0);
@@ -60,7 +60,7 @@ int communication::connectToServer(char dest_IP_Address[15],int dest_port){
 			printf("\nError in connect");
 			exit(0);
 		}
-		printf("Socket connected to server \n");
+		//printf("Socket connected to server \n");
 		return sockfd;
 }
 

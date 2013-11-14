@@ -67,3 +67,12 @@ bool LexiQueue::update(int **quorum,int qsize,int ID){
 	return true;
 }
 
+int LexiQueue::size(){
+	int ret = pq.size();
+	return ret;
+}
+
+bool LexiQueue::isEmpty(){
+	return pq.empty();
+}
+

@@ -49,7 +49,7 @@ bool Torum::requestCS(){
 	queue->add(request);
 	pthread_mutex_unlock(&sharedQLock);
 	*/
-	if( HOLDER== -1 ){
+	if( HOLDER == -1 ){
 		for(int i=0;i<quorumsize;i++){
 			com.sendMessageToID(request,quorum[ID][i]);
 		}

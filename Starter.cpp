@@ -216,10 +216,11 @@ void *TorumProcess(void* queue) {
 	// Remove 1 item at a time and process it. Blocks if no items are
 	// available to process.
 	for (int i = 0;; i++) {
+		printf("NODE STATUS: Seq=%d, Holder=%d, inCS?=%d, Queue Size=%d",node->sequenceNo,node->HOLDER,node->inCS,node->queue->size());
 		printf("TorumProcessing Thread , loop %d - waiting for item...\n", i);
 		Packet* item = m_queue->remove();
 		//printf("thread  loop %d - got one item\n", i);
-		printf("Received: messageType - %d, SEQ number - %ld\n",item->TYPE, item->SEQ);
+		//printf("Received: messageType - %d, SEQ number - %ld\n",item->TYPE, item->SEQ);
 
 		if (item->TYPE == SEND_TOKEN){
 			printf("SEND_TOKEN recieved from Node %d and packet type is %d\n",item->ORIGIN,item->TYPE);

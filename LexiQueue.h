@@ -27,7 +27,8 @@ public:
 	Packet top();
 	Packet remove(int origin);
 	bool add(Packet in);
-
+	int size();
+	bool isEmpty();
 	bool update(int **quorum,int qsize,int ID);
 };
 
